@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beni Seviyor Musun? ❤️</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            padding: 20px;
+            overflow: hidden;
+        }
+        
+        .container {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            max-width: 90%;
+            width: 380px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        h1 {
+            color: #ff4d6d;
+            margin-bottom: 30px;
+            font-size: 24px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 140px;
+            height: 60px;
+        }
+        
+        #yesButton {
+            background: linear-gradient(to right, #4CAF50, #2E8B57);
+            color: white;
+        }
+        
+        #yesButton:active {
+            transform: scale(0.97);
+        }
+        
+        #noButton {
+            background: linear-gradient(to right, #FF416C, #FF4B2B);
+            color: white;
+            position: relative;
+        }
+        
+        .message {
+            margin-top: 30px;
+            font-size: 22px;
+            color: #ff4d6d;
+            font-weight: bold;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        
+        .message.show {
+            opacity: 1;
+        }
+        
+        .hearts-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+        
+        .heart-fly {
+            position: absolute;
+            font-size: 20px;
+            color: #ff4d6d;
+            opacity: 0;
+            animation: fly 4s linear forwards;
+        }
+        
+        @keyframes fly {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(0.5);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--x), var(--y)) scale(2);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px 15px;
+            }
+            
+            h1 {
+                font-size: 20px;
+                margin-bottom: 25px;
+            }
+            
+            button {
+                padding: 14px 25px;
+                font-size: 16px;
+                width: 130px;
+                height: 55px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Beni seviyor musun? 💕</h1>
+        <div class="buttons">
+            <button id="yesButton">Evet</button>
+            <button id="noButton">Hayır</button>
+        </div>
+        <div class="message" id="message"></div>
+    </div>
+    
+    <div class="hearts-container" id="heartsContainer"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const yesButton = document.getElementById('yesButton');
+            const noButton = document.getElementById('noButton');
+            const message = document.getElementById('message');
+            const heartsContainer = document.getElementById('heartsContainer');
+            
+            let noCount = 0;
+            
+            // Hayır butonuna dokunulduğunda veya üzerine gelindiğinde
+            noButton.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                moveButton();
+            });
+            
+            noButton.addEventListener('mouseover', moveButton);
+            
+            // Evet butonuna tıklandığında
+            yesButton.addEventListener('click', function() {
+                message.textContent = "Ben de seni seviyorum! 💖";
+                message.classList.add('show');
+                
+                // Uçan kalpler efekti
+                createHearts();
+                
+                // Butonları gizle
+                yesButton.style.display = 'none';
+                noButton.style.display = 'none';
+            });
+            
+            function moveButton() {
+                noCount++;
+                
+                // Ekran boyutlarını ve buton boyutunu al
+                const containerRect = document.querySelector('.container').getBoundingClientRect();
+                const buttonWidth = noButton.offsetWidth;
+                const buttonHeight = noButton.offsetHeight;
+                
+                // Butonun hareket edeceği maksimum x ve y değerleri
+                const maxX = containerRect.width - buttonWidth;
+                const maxY = containerRect.height - buttonHeight;
+                
+                // Rastgele konum belirle
+                const randomX = Math.floor(Math.random() * maxX);
+                const randomY = Math.floor(Math.random() * maxY);
+                
+                // Butonun konumunu mutlak konuma değiştir
+                noButton.style.position = 'absolute';
+                noButton.style.left = randomX + 'px';
+                noButton.style.top = randomY + 'px';
+                
+                // İlk birkaç tıklamadan sonra mesaj göster
+                const messages = [
+                    "Emin misin?",
+                    "Tekrar düşün!",
+                    "Lütfen!",
+                    "Son şansın!",
+                    "Vazgeç artık!",
+                    "Yakalayamazsın beni!",
+                    "Çok ısrar ettin!",
+                    "Tamam pes ediyorum!"
+                ];
+                
+                if (noCount <= messages.length) {
+                    message.textContent = messages[noCount - 1];
+                    message.classList.add('show');
+                    
+                    // 2 saniye sonra mesajı gizle
+                    setTimeout(() => {
+                        message.classList.remove('show');
+                    }, 2000);
+                }
+            }
+            
+            function createHearts() {
+                for (let i = 0; i < 30; i++) {
+                    setTimeout(() => {
+                        const heart = document.createElement('div');
+                        heart.classList.add('heart-fly');
+                        heart.innerHTML = '❤️';
+                        
+                        // Rastgele başlangıç pozisyonu
+                        const startX = Math.random() * window.innerWidth;
+                        const startY = Math.random() * window.innerHeight;
+                        
+                        // Rastgele bitiş pozisyonu
+                        const endX = (Math.random() - 0.5) * 2 * window.innerWidth;
+                        const endY = (Math.random() - 0.5) * 2 * window.innerHeight;
+                        
+                        heart.style.setProperty('--x', `${endX}px`);
+                        heart.style.setProperty('--y', `${endY}px`);
+                        heart.style.left = `${startX}px`;
+                        heart.style.top = `${startY}px`;
+                        
+                        heartsContainer.appendChild(heart);
+                        
+                        // Animasyon bittikten sonra kalbi kaldır
+                        setTimeout(() => {
+                            heart.remove();
+                        }, 4000);
+                    }, i * 100);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
