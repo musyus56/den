@@ -47,6 +47,8 @@
             gap: 15px;
             margin-top: 20px;
             flex-wrap: wrap;
+            position: relative;
+            min-height: 120px;
         }
         
         button {
@@ -75,6 +77,7 @@
             background: linear-gradient(to right, #FF416C, #FF4B2B);
             color: white;
             position: relative;
+            transition: all 0.5s ease;
         }
         
         .message {
@@ -92,6 +95,12 @@
         
         .message.show {
             opacity: 1;
+        }
+        
+        .counter {
+            margin-top: 15px;
+            font-size: 16px;
+            color: #888;
         }
         
         .hearts-container {
@@ -147,8 +156,9 @@
         <h1>Beni seviyor musun? 💕</h1>
         <div class="buttons">
             <button id="yesButton">Evet</button>
-            <button id="noButton">Hayır</button>
+            <button id="noButton">arkadaş olarak</button>
         </div>
+        <div class="counter" id="counter">Kaçış sayacı: 0/50</div>
         <div class="message" id="message"></div>
     </div>
     
@@ -159,9 +169,11 @@
             const yesButton = document.getElementById('yesButton');
             const noButton = document.getElementById('noButton');
             const message = document.getElementById('message');
+            const counter = document.getElementById('counter');
             const heartsContainer = document.getElementById('heartsContainer');
             
             let noCount = 0;
+            let maxAttempts = 50; // 50 deneme sonra buton duracak
             
             // Hayır butonuna dokunulduğunda veya üzerine gelindiğinde
             noButton.addEventListener('touchstart', function(e) {
@@ -182,10 +194,21 @@
                 // Butonları gizle
                 yesButton.style.display = 'none';
                 noButton.style.display = 'none';
+                counter.style.display = 'none';
             });
             
             function moveButton() {
                 noCount++;
+                counter.textContent = `Kaçış sayacı: ${noCount}/${maxAttempts}`;
+                
+                // Maksimum deneme sayısına ulaşıldıysa buton artık kaçmasın
+                if (noCount >= maxAttempts) {
+                    noButton.style.background = "linear-gradient(to right, #888, #999)";
+                    noButton.style.cursor = "not-allowed";
+                    message.textContent = "Yoruldum, artık kaçamıyorum 😅";
+                    message.classList.add('show');
+                    return;
+                }
                 
                 // Ekran boyutlarını ve buton boyutunu al
                 const containerRect = document.querySelector('.container').getBoundingClientRect();
@@ -205,7 +228,7 @@
                 noButton.style.left = randomX + 'px';
                 noButton.style.top = randomY + 'px';
                 
-                // İlk birkaç tıklamadan sonra mesaj göster
+                // Mesajları göster
                 const messages = [
                     "Emin misin?",
                     "Tekrar düşün!",
@@ -214,7 +237,41 @@
                     "Vazgeç artık!",
                     "Yakalayamazsın beni!",
                     "Çok ısrar ettin!",
-                    "Tamam pes ediyorum!"
+                    "Yaklaşıyorsun!",
+                    "Daha fazla dayanamayacağım!",
+                    "Neredeyse yakaladın!",
+                    "Yorulmadın mı?",
+                    "Vazgeçmeyecek misin?",
+                    "Israrcı birisin!",
+                    "Pes etmiyorum!",
+                    "Yakında yorulacağım!",
+                    "Dayanıyorum!",
+                    "Yakalayamazsın!",
+                    "Hala kaçıyorum!",
+                    "Gücüm tükeniyor!",
+                    "Son anlarım!",
+                    "Az kaldı!",
+                    "Bitmek bilmiyor!",
+                    "Yoruldum ama devam!",
+                    "Pes etmeyeceğim!",
+                    "Son direniş!",
+                    "Dayanıyorum!",
+                    "Yakında pes edeceğim!",
+                    "Son 20 deneme!",
+                    "Azimlisin!",
+                    "Vazgeçmeye yakın!",
+                    "Son 15!",
+                    "Dayanabiliyorum!",
+                    "Yakında duracağım!",
+                    "Son 10!",
+                    "Neredeyse bitti!",
+                    "Bitmek üzere!",
+                    "Son 5!",
+                    "Az kaldı!",
+                    "Son 3!",
+                    "Neredeyse!",
+                    "Son!",
+                    "Artık kaçamıyorum!"
                 ];
                 
                 if (noCount <= messages.length) {
@@ -223,13 +280,15 @@
                     
                     // 2 saniye sonra mesajı gizle
                     setTimeout(() => {
-                        message.classList.remove('show');
+                        if (noCount < maxAttempts) {
+                            message.classList.remove('show');
+                        }
                     }, 2000);
                 }
             }
             
             function createHearts() {
-                for (let i = 0; i < 30; i++) {
+                for (let i = 0; i < 50; i++) {
                     setTimeout(() => {
                         const heart = document.createElement('div');
                         heart.classList.add('heart-fly');
