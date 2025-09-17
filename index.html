@@ -32,7 +32,6 @@
             width: 380px;
             position: relative;
             overflow: hidden;
-            z-index: 10;
         }
         
         h1 {
@@ -42,14 +41,21 @@
             text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
         
+        .buttons-wrapper {
+            position: relative;
+            min-height: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
         .buttons {
             display: flex;
             justify-content: center;
             gap: 15px;
-            margin-top: 20px;
             flex-wrap: wrap;
             position: relative;
-            min-height: 120px;
+            width: 100%;
         }
         
         button {
@@ -63,12 +69,12 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             width: 140px;
             height: 60px;
-            z-index: 20;
         }
         
         #yesButton {
             background: linear-gradient(to right, #4CAF50, #2E8B57);
             color: white;
+            position: static;
         }
         
         #yesButton:active {
@@ -78,8 +84,7 @@
         #noButton {
             background: linear-gradient(to right, #FF416C, #FF4B2B);
             color: white;
-            position: relative;
-            transition: all 0.5s ease;
+            position: static;
         }
         
         .message {
@@ -106,7 +111,7 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 5;
+            z-index: 100;
         }
         
         .heart-fly {
@@ -115,7 +120,6 @@
             color: #ff4d6d;
             opacity: 0;
             animation: fly 4s linear forwards;
-            z-index: 5;
         }
         
         @keyframes fly {
@@ -151,9 +155,11 @@
 <body>
     <div class="container">
         <h1>Beni seviyor musun? 💕</h1>
-        <div class="buttons">
-            <button id="yesButton">Evet</button>
-            <button id="noButton">arkadaş olarak</button>
+        <div class="buttons-wrapper">
+            <div class="buttons">
+                <button id="yesButton">Evet</button>
+                <button id="noButton">arkadaş olarak</button>
+            </div>
         </div>
         <div class="message" id="message"></div>
     </div>
@@ -166,44 +172,41 @@
             const noButton = document.getElementById('noButton');
             const message = document.getElementById('message');
             const heartsContainer = document.getElementById('heartsContainer');
-            const container = document.querySelector('.container');
+            const buttonsWrapper = document.querySelector('.buttons-wrapper');
             
             let noCount = 0;
-            let maxAttempts = 50; // 50 deneme sonra buton duracak
+            let maxAttempts = 50;
             
-            // Butonun konteyner sınırlarını kontrol et
-            function ensureButtonInContainer(button, containerRect) {
+            // Butonun sınırlar içinde kalmasını sağla
+            function keepButtonInBounds(button) {
+                const wrapperRect = buttonsWrapper.getBoundingClientRect();
                 const buttonRect = button.getBoundingClientRect();
-                const containerLeft = containerRect.left;
-                const containerRight = containerRect.right;
-                const containerTop = containerRect.top;
-                const containerBottom = containerRect.bottom;
                 
-                let newLeft = parseInt(button.style.left) || 0;
-                let newTop = parseInt(button.style.top) || 0;
+                let left = parseInt(button.style.left) || 0;
+                let top = parseInt(button.style.top) || 0;
                 
                 // Sol sınır kontrolü
-                if (buttonRect.left < containerLeft) {
-                    newLeft = 0;
+                if (left < 0) {
+                    left = 0;
                 }
                 
                 // Sağ sınır kontrolü
-                if (buttonRect.right > containerRight) {
-                    newLeft = containerRect.width - button.offsetWidth;
+                if (left + buttonRect.width > wrapperRect.width) {
+                    left = wrapperRect.width - buttonRect.width;
                 }
                 
                 // Üst sınır kontrolü
-                if (buttonRect.top < containerTop) {
-                    newTop = 0;
+                if (top < 0) {
+                    top = 0;
                 }
                 
                 // Alt sınır kontrolü
-                if (buttonRect.bottom > containerBottom) {
-                    newTop = containerRect.height - button.offsetHeight;
+                if (top + buttonRect.height > wrapperRect.height) {
+                    top = wrapperRect.height - buttonRect.height;
                 }
                 
-                button.style.left = newLeft + 'px';
-                button.style.top = newTop + 'px';
+                button.style.left = left + 'px';
+                button.style.top = top + 'px';
             }
             
             // Hayır butonuna dokunulduğunda veya üzerine gelindiğinde
@@ -239,28 +242,29 @@
                     return;
                 }
                 
-                // Ekran boyutlarını ve buton boyutunu al
-                const containerRect = container.getBoundingClientRect();
+                // Butonun konumunu mutlak yap
+                noButton.style.position = 'absolute';
+                
+                // Buton boyutlarını ve wrapper boyutlarını al
                 const buttonWidth = noButton.offsetWidth;
                 const buttonHeight = noButton.offsetHeight;
+                const wrapperWidth = buttonsWrapper.offsetWidth;
+                const wrapperHeight = buttonsWrapper.offsetHeight;
                 
                 // Butonun hareket edeceği maksimum x ve y değerleri
-                const maxX = containerRect.width - buttonWidth;
-                const maxY = containerRect.height - buttonHeight;
+                const maxX = wrapperWidth - buttonWidth;
+                const maxY = wrapperHeight - buttonHeight;
                 
-                // Rastgele konum belirle (kenarlardan 10px içeride)
-                const randomX = Math.max(10, Math.min(maxX - 10, Math.floor(Math.random() * maxX)));
-                const randomY = Math.max(10, Math.min(maxY - 10, Math.floor(Math.random() * maxY)));
+                // Rastgele konum belirle (kenarlardan 5px içeride)
+                const randomX = Math.max(5, Math.min(maxX - 5, Math.floor(Math.random() * maxX)));
+                const randomY = Math.max(5, Math.min(maxY - 5, Math.floor(Math.random() * maxY)));
                 
-                // Butonun konumunu mutlak konuma değiştir
-                noButton.style.position = 'absolute';
+                // Butonun konumunu değiştir
                 noButton.style.left = randomX + 'px';
                 noButton.style.top = randomY + 'px';
                 
-                // Butonun konteyner içinde kaldığından emin ol
-                setTimeout(() => {
-                    ensureButtonInContainer(noButton, containerRect);
-                }, 10);
+                // Butonun sınırlar içinde kaldığından emin ol
+                keepButtonInBounds(noButton);
                 
                 // Mesajları göster
                 const messages = [
