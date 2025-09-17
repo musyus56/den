@@ -32,6 +32,7 @@
             width: 380px;
             position: relative;
             overflow: hidden;
+            z-index: 10;
         }
         
         h1 {
@@ -62,6 +63,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             width: 140px;
             height: 60px;
+            z-index: 20;
         }
         
         #yesButton {
@@ -104,7 +106,7 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 100;
+            z-index: 5;
         }
         
         .heart-fly {
@@ -113,6 +115,7 @@
             color: #ff4d6d;
             opacity: 0;
             animation: fly 4s linear forwards;
+            z-index: 5;
         }
         
         @keyframes fly {
@@ -163,9 +166,45 @@
             const noButton = document.getElementById('noButton');
             const message = document.getElementById('message');
             const heartsContainer = document.getElementById('heartsContainer');
+            const container = document.querySelector('.container');
             
             let noCount = 0;
             let maxAttempts = 50; // 50 deneme sonra buton duracak
+            
+            // Butonun konteyner sınırlarını kontrol et
+            function ensureButtonInContainer(button, containerRect) {
+                const buttonRect = button.getBoundingClientRect();
+                const containerLeft = containerRect.left;
+                const containerRight = containerRect.right;
+                const containerTop = containerRect.top;
+                const containerBottom = containerRect.bottom;
+                
+                let newLeft = parseInt(button.style.left) || 0;
+                let newTop = parseInt(button.style.top) || 0;
+                
+                // Sol sınır kontrolü
+                if (buttonRect.left < containerLeft) {
+                    newLeft = 0;
+                }
+                
+                // Sağ sınır kontrolü
+                if (buttonRect.right > containerRight) {
+                    newLeft = containerRect.width - button.offsetWidth;
+                }
+                
+                // Üst sınır kontrolü
+                if (buttonRect.top < containerTop) {
+                    newTop = 0;
+                }
+                
+                // Alt sınır kontrolü
+                if (buttonRect.bottom > containerBottom) {
+                    newTop = containerRect.height - button.offsetHeight;
+                }
+                
+                button.style.left = newLeft + 'px';
+                button.style.top = newTop + 'px';
+            }
             
             // Hayır butonuna dokunulduğunda veya üzerine gelindiğinde
             noButton.addEventListener('touchstart', function(e) {
@@ -201,7 +240,7 @@
                 }
                 
                 // Ekran boyutlarını ve buton boyutunu al
-                const containerRect = document.querySelector('.container').getBoundingClientRect();
+                const containerRect = container.getBoundingClientRect();
                 const buttonWidth = noButton.offsetWidth;
                 const buttonHeight = noButton.offsetHeight;
                 
@@ -209,14 +248,19 @@
                 const maxX = containerRect.width - buttonWidth;
                 const maxY = containerRect.height - buttonHeight;
                 
-                // Rastgele konum belirle
-                const randomX = Math.floor(Math.random() * maxX);
-                const randomY = Math.floor(Math.random() * maxY);
+                // Rastgele konum belirle (kenarlardan 10px içeride)
+                const randomX = Math.max(10, Math.min(maxX - 10, Math.floor(Math.random() * maxX)));
+                const randomY = Math.max(10, Math.min(maxY - 10, Math.floor(Math.random() * maxY)));
                 
                 // Butonun konumunu mutlak konuma değiştir
                 noButton.style.position = 'absolute';
                 noButton.style.left = randomX + 'px';
                 noButton.style.top = randomY + 'px';
+                
+                // Butonun konteyner içinde kaldığından emin ol
+                setTimeout(() => {
+                    ensureButtonInContainer(noButton, containerRect);
+                }, 10);
                 
                 // Mesajları göster
                 const messages = [
