@@ -97,12 +97,6 @@
             opacity: 1;
         }
         
-        .counter {
-            margin-top: 15px;
-            font-size: 16px;
-            color: #888;
-        }
-        
         .hearts-container {
             position: fixed;
             top: 0;
@@ -158,7 +152,6 @@
             <button id="yesButton">Evet</button>
             <button id="noButton">arkadaş olarak</button>
         </div>
-        <div class="counter" id="counter">Kaçış sayacı: 0/50</div>
         <div class="message" id="message"></div>
     </div>
     
@@ -169,7 +162,6 @@
             const yesButton = document.getElementById('yesButton');
             const noButton = document.getElementById('noButton');
             const message = document.getElementById('message');
-            const counter = document.getElementById('counter');
             const heartsContainer = document.getElementById('heartsContainer');
             
             let noCount = 0;
@@ -194,12 +186,10 @@
                 // Butonları gizle
                 yesButton.style.display = 'none';
                 noButton.style.display = 'none';
-                counter.style.display = 'none';
             });
             
             function moveButton() {
                 noCount++;
-                counter.textContent = `Kaçış sayacı: ${noCount}/${maxAttempts}`;
                 
                 // Maksimum deneme sayısına ulaşıldıysa buton artık kaçmasın
                 if (noCount >= maxAttempts) {
